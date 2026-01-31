@@ -20,11 +20,15 @@ Todas as mudanças notáveis deste projeto.
 - Session log: 2026-01-30-config-inicial.md
 
 ### Configurado em Produção
-- [x] Milão: interfaces, bridge, IPs, WireGuard, firewall, NAT
-- [x] RJ: reset, interfaces, IP público, WireGuard, firewall
-- [x] Túnel testado com Mac (funcionando)
+- [x] Milão (HEX-MILAO): interfaces, bridge, IPs, WireGuard, firewall, NAT
+- [x] RJ (HEX-RJ): reset, interfaces, IP público, WireGuard, firewall
+- [x] Túnel Mac ↔ RJ funcionando
+- [x] Túnel Milão ↔ RJ funcionando
+- [x] Mac ↔ Milão (via RJ) funcionando
+- [x] Câmera PTZ configurada (10.39.2.1)
+- [x] Acesso Mac → Câmera funcionando
 
 ### A Fazer
-- [ ] Testar túnel Milão ↔ RJ (quando Milão tiver internet)
-- [ ] Conectar PTZ e validar controle
+- [ ] Testar controle PTZ do RJ (portas 80/443/52380)
+- [ ] Validação final em produção
 - [ ] Configs alternativas (EoIP)

@@ -3,6 +3,9 @@
 # WAN: DHCP
 # Gerencia: 10.19.4.97/24
 
+# Identity
+/system identity set name=HEX-MILAO
+
 # Gerencia
 /ip address add address=10.19.4.97/24 interface=ether5 comment="Gerencia local"
 
@@ -28,17 +31,18 @@
 /interface wireguard add name=wg-tunel-rj listen-port=51820 comment="Tunel para RJ"
 /ip address add address=10.255.255.2/30 interface=wg-tunel-rj comment="IP do tunel - lado Milao"
 
-# Peer RJ
+# Peer RJ (inclui Mac Junior no allowed-address para roteamento)
 /interface wireguard peers add interface=wg-tunel-rj \
     public-key="IHIbDun/o0cvWiizZ4QuPg6yGZdvSdgTri3PsUFefyM=" \
     endpoint-address=200.166.233.205 \
     endpoint-port=51820 \
-    allowed-address=10.255.255.0/30,10.55.21.0/24 \
+    allowed-address=10.255.255.0/30,10.55.21.0/24,10.255.255.5/32 \
     persistent-keepalive=25s \
     comment="Peer RJ"
 
-# Rota para rede RJ
+# Rotas
 /ip route add dst-address=10.55.21.0/24 gateway=10.255.255.1 comment="Rota para rede RJ via tunel"
+/ip route add dst-address=10.255.255.5/32 gateway=wg-tunel-rj comment="Rota Mac Junior"
 
 # Firewall
 /ip firewall filter
@@ -48,11 +52,14 @@ add chain=input action=accept protocol=icmp comment="Aceita ICMP"
 add chain=input action=accept src-address=10.19.4.0/24 in-interface=ether5-mgmt comment="Aceita gerencia local"
 add chain=input action=accept protocol=udp dst-port=51820 in-interface=ether1-wan comment="WireGuard UDP"
 add chain=input action=accept src-address=10.255.255.0/30 comment="Aceita do tunel WG"
+add chain=input action=accept src-address=10.255.255.5 comment="Aceita Mac Junior"
 add chain=input action=drop in-interface=ether1-wan comment="Bloqueia resto da WAN"
 add chain=forward action=accept connection-state=established,related comment="Aceita conexoes estabelecidas"
 add chain=forward action=drop connection-state=invalid comment="Descarta invalidas"
 add chain=forward action=accept src-address=10.55.21.0/24 dst-address=10.39.2.0/24 comment="RJ -> PTZ permitido"
 add chain=forward action=accept src-address=10.39.2.0/24 dst-address=10.55.21.0/24 comment="PTZ -> RJ permitido"
+add chain=forward action=accept src-address=10.255.255.5 dst-address=10.39.2.0/24 comment="Mac -> PTZ permitido"
+add chain=forward action=accept src-address=10.39.2.0/24 dst-address=10.255.255.5 comment="PTZ -> Mac permitido"
 add chain=forward action=drop in-interface=ether1-wan comment="Bloqueia forward da WAN"
 
 # NAT

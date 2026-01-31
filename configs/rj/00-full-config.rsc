@@ -61,4 +61,6 @@ add chain=forward action=accept connection-state=established,related comment="Ac
 add chain=forward action=drop connection-state=invalid comment="Descarta invalidas"
 add chain=forward action=accept src-address=10.55.21.0/24 dst-address=10.39.2.0/24 comment="LAN RJ -> PTZ Milao"
 add chain=forward action=accept src-address=10.39.2.0/24 dst-address=10.55.21.0/24 comment="PTZ Milao -> LAN RJ"
+add chain=forward action=accept src-address=10.255.255.5 comment="Forward Mac Junior"
+add chain=forward action=accept dst-address=10.255.255.5 comment="Forward para Mac Junior"
 add chain=forward action=drop in-interface=ether1-wan comment="Bloqueia forward da WAN"

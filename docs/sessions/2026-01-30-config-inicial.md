@@ -5,12 +5,13 @@ Configuração completa dos dois MikroTik hEX S para túnel WireGuard entre Mil�
 
 ## Equipamentos Configurados
 
-### Milão (hEX S)
+### Milão (hEX S) - Identity: HEX-MILAO
 - **MAC**: 48:A9:8A:49:0F:FB (ether1)
 - **Gerência**: 10.19.4.97/24 (ether5-mgmt)
 - **WAN**: DHCP (ether1-wan)
 - **Bridge PTZ**: 10.39.2.254/24 (ether2-4)
 - **Túnel**: 10.255.255.2/30
+- **Câmera PTZ**: 10.39.2.1 (Panasonic)
 
 ### RJ (hEX S) - Identity: HEX-RJ
 - **Gerência**: 10.19.4.98/24 (ether5-mgmt)
@@ -25,6 +26,7 @@ Configuração completa dos dois MikroTik hEX S para túnel WireGuard entre Mil�
 |-------|---------------|
 | Milão | `SdEiOC6I+VriNU5GgHfC6dXfhLO69iioNDCJQYeeQEk=` |
 | RJ | `IHIbDun/o0cvWiizZ4QuPg6yGZdvSdgTri3PsUFefyM=` |
+| Mac Junior | `VNhVN7vapLi9bIaZ/JPUJBhkt89wfNsowPEt/7/0XWc=` |
 
 ## Comandos Executados
 
@@ -59,14 +61,37 @@ Configuração completa dos dois MikroTik hEX S para túnel WireGuard entre Mil�
 - **Problema encontrado**: Handshake funcionava mas ping não
 - **Causa**: Faltava rota para 10.255.255.5 (fora do /30)
 - **Solução**: `/ip route add dst-address=10.255.255.5/32 gateway=wg-tunel-milao`
-- **Resultado**: Túnel funcionando ✅
+- **Resultado**: Túnel Mac ↔ RJ funcionando ✅
+
+## Teste Túnel Milão ↔ RJ
+- Endpoint corrigido de .206 para .205 no Milão
+- **Resultado**: Handshake OK, rx/tx funcionando ✅
+
+## Acesso Mac → Milão (via RJ)
+- **Problema**: Mac não pingava Milão (10.255.255.2)
+- **Causa**: Milão não conhecia IP do Mac no allowed-address
+- **Solução**:
+  - No Milão: `allowed-address` do peer RJ inclui `10.255.255.5/32`
+  - No Milão: rota para 10.255.255.5 via wg-tunel-rj
+  - No RJ: regras de forward para Mac
+- **Resultado**: Mac ↔ Milão funcionando ✅
+
+## Configuração da Câmera PTZ
+- Câmera estava com IP antigo: 172.16.40.3
+- Adicionado IP temporário no Milão para acessar
+- Configurado allowed-address e rotas para 172.16.40.0/24 temporariamente
+- Câmera reconfigurada para IP definitivo: **10.39.2.1**
+- Removidas configs temporárias
+- **Resultado**: Câmera acessível via túnel ✅
 
 ## Pendências
 - [x] Testar túnel com ping 10.255.255.x
-- [ ] Conectar PTZ na ether2 do Milão
-- [ ] Testar controle PTZ do RJ
-- [ ] Validar portas 80/443/52380
-- [ ] Configurar peer do Milão quando tiver internet
+- [x] Configurar peer do Milão
+- [x] Testar túnel Milão ↔ RJ
+- [x] Conectar PTZ e configurar IP
+- [x] Testar acesso Mac → Câmera
+- [ ] Testar controle PTZ do RJ (portas 80/443/52380)
+- [ ] Validar na produção final
 
 ## Arquivos Criados
 - `configs/milao/00-full-config.rsc` - Config completa Milão

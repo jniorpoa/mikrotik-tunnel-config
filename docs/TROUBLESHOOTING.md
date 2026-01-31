@@ -136,6 +136,45 @@ sudo wg-quick down ~/wg-rj.conf && sudo wg-quick up ~/wg-rj.conf
 
 3. Verificar firewall permite forward entre as redes
 
+### Peer A não pinga Peer B (via hub)
+
+Em topologia hub-spoke (RJ como centralizador), para Peer A acessar Peer B:
+
+**No Hub (RJ):**
+1. Peer A precisa ter IP do Peer B no `allowed-address` para roteamento
+2. Peer B precisa ter IP do Peer A no `allowed-address` para roteamento
+3. Firewall precisa permitir forward entre os peers
+4. Rotas para ambos os IPs
+
+**No Peer B:**
+1. O `allowed-address` do peer hub deve incluir o IP do Peer A
+2. Rota para IP do Peer A via túnel
+3. Firewall aceitar conexões do IP do Peer A
+
+**Exemplo prático (Mac → Milão via RJ):**
+
+No RJ:
+```routeros
+# Peer Milão precisa conhecer IP do Mac
+/interface wireguard peers set [find comment="Peer Milao"] allowed-address=10.255.255.0/30,10.39.2.0/24
+
+# Forward entre peers
+/ip firewall filter add chain=forward action=accept src-address=10.255.255.5 comment="Forward Mac"
+/ip firewall filter add chain=forward action=accept dst-address=10.255.255.5 comment="Forward para Mac"
+```
+
+No Milão:
+```routeros
+# Peer RJ precisa incluir IP do Mac
+/interface wireguard peers set 0 allowed-address=10.255.255.0/30,10.55.21.0/24,10.255.255.5/32
+
+# Rota para Mac
+/ip route add dst-address=10.255.255.5/32 gateway=wg-tunel-rj
+
+# Firewall aceitar Mac
+/ip firewall filter add chain=input action=accept src-address=10.255.255.5 comment="Aceita Mac"
+```
+
 ## Arquitetura da Solução
 
 ```
