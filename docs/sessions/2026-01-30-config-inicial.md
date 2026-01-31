@@ -44,12 +44,32 @@ Configuração completa dos dois MikroTik hEX S para túnel WireGuard entre Mil�
 3. Config completa em bloco único:
    - Gerência, interfaces, IP público, WireGuard, peer Milão, rota, firewall
 
+## Ajustes Pós-Config
+
+### RJ
+- IP alterado de .206 para **.205**
+- Winbox WAN porta **9595**
+- Identity: **HEX-RJ**
+- Peer Mac Junior adicionado
+- Rota e firewall para 10.255.255.5
+
+## Teste do Túnel (Mac)
+- Peer criado no RJ para Mac (10.255.255.5)
+- Config WireGuard gerada para Mac
+- **Problema encontrado**: Handshake funcionava mas ping não
+- **Causa**: Faltava rota para 10.255.255.5 (fora do /30)
+- **Solução**: `/ip route add dst-address=10.255.255.5/32 gateway=wg-tunel-milao`
+- **Resultado**: Túnel funcionando ✅
+
 ## Pendências
-- [ ] Testar túnel com ping 10.255.255.x
+- [x] Testar túnel com ping 10.255.255.x
 - [ ] Conectar PTZ na ether2 do Milão
 - [ ] Testar controle PTZ do RJ
 - [ ] Validar portas 80/443/52380
+- [ ] Configurar peer do Milão quando tiver internet
 
 ## Arquivos Criados
 - `configs/milao/00-full-config.rsc` - Config completa Milão
 - `configs/rj/00-full-config.rsc` - Config completa RJ
+- `configs/mac/wg-rj.conf` - Config WireGuard para Mac
+- `docs/TROUBLESHOOTING.md` - Guia de troubleshooting
