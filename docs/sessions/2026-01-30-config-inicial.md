@@ -12,11 +12,12 @@ Configuração completa dos dois MikroTik hEX S para túnel WireGuard entre Mil�
 - **Bridge PTZ**: 10.39.2.254/24 (ether2-4)
 - **Túnel**: 10.255.255.2/30
 
-### RJ (hEX S)
+### RJ (hEX S) - Identity: HEX-RJ
 - **Gerência**: 10.19.4.98/24 (ether5-mgmt)
-- **WAN**: 200.166.233.206/28 (ether1-wan)
+- **WAN**: 200.166.233.205/28 (ether1-wan)
 - **Gateway**: 200.166.233.193
 - **Túnel**: 10.255.255.1/30
+- **Winbox WAN**: porta 9595
 
 ## Chaves WireGuard
 

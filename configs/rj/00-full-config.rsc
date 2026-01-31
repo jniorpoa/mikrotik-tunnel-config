@@ -1,7 +1,11 @@
 # MikroTik RJ - Configuracao Completa
 # Executar apos reset: /import file=00-full-config.rsc
-# IP Publico: 200.166.233.206/28
+# IP Publico: 200.166.233.205/28
 # Gateway: 200.166.233.193
+# Winbox WAN: porta 9595
+
+# Identity
+/system identity set name=HEX-RJ
 
 # Gerencia
 /ip address add address=10.19.4.98/24 interface=ether5 comment="Gerencia RJ"
@@ -14,7 +18,7 @@
 /interface ethernet set ether5 name=ether5-mgmt comment="Gerencia"
 
 # IP Publico
-/ip address add address=200.166.233.206/28 interface=ether1-wan comment="IP Publico"
+/ip address add address=200.166.233.205/28 interface=ether1-wan comment="IP Publico"
 /ip route add gateway=200.166.233.193 comment="Gateway internet"
 /ip dns set servers=8.8.8.8,8.8.4.4
 
@@ -40,7 +44,11 @@ add chain=input action=accept protocol=icmp comment="Aceita ICMP"
 add chain=input action=accept src-address=10.19.4.0/24 in-interface=ether5-mgmt comment="Aceita gerencia local"
 add chain=input action=accept protocol=udp dst-port=51820 in-interface=ether1-wan comment="WireGuard UDP"
 add chain=input action=accept src-address=10.255.255.0/30 comment="Aceita do tunel WG"
+add chain=input action=accept protocol=tcp dst-port=9595 in-interface=ether1-wan comment="Winbox WAN"
 add chain=input action=drop in-interface=ether1-wan comment="Bloqueia resto da WAN"
+
+# Winbox porta 9595
+/ip service set winbox port=9595
 add chain=forward action=accept connection-state=established,related comment="Aceita conexoes estabelecidas"
 add chain=forward action=drop connection-state=invalid comment="Descarta invalidas"
 add chain=forward action=accept src-address=10.55.21.0/24 dst-address=10.39.2.0/24 comment="LAN RJ -> PTZ Milao"

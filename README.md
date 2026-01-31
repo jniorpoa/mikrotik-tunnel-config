@@ -47,7 +47,7 @@ Configuração de túnel WireGuard entre MikroTiks (Milão ↔ RJ) para controle
 - **PTZ**: Panasonic AW-UE70 (IP: 10.39.2.1)
   - Controle: TCP 80/443, UDP 52380
 - **MikroTik Milão**: hEX S (RB760iGS) - Gerência: 10.19.4.97
-- **MikroTik RJ**: hEX S (RB760iGS) - Gerência: 10.19.4.98 - WAN: 200.166.233.206/28
+- **MikroTik RJ**: hEX S (RB760iGS) - Gerência: 10.19.4.98 - WAN: 200.166.233.205/28 - Winbox: 9595
 
 ## Configuração
 

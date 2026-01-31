@@ -31,7 +31,7 @@
 # Peer RJ
 /interface wireguard peers add interface=wg-tunel-rj \
     public-key="IHIbDun/o0cvWiizZ4QuPg6yGZdvSdgTri3PsUFefyM=" \
-    endpoint-address=200.166.233.206 \
+    endpoint-address=200.166.233.205 \
     endpoint-port=51820 \
     allowed-address=10.255.255.0/30,10.55.21.0/24 \
     persistent-keepalive=25s \
