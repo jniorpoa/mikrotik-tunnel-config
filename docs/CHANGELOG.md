@@ -2,7 +2,29 @@
 
 Todas as mudanças notáveis deste projeto.
 
-## [Unreleased]
+## [2026-02-04] - NAT VLAN 400
+
+### Adicionado
+- NAT para câmera PTZ: 172.16.40.3 → 10.39.2.1
+- Integração com VLAN 400 corporativa (br06 porta 31)
+- Regra firewall para aceitar tráfego da VLAN 400
+- Session log: 2026-02-04-nat-vlan400.md
+
+### Configurado em Produção
+- [x] ether4 do HEX-RJ conectada ao br06 porta 31 (VLAN 400)
+- [x] IP 172.16.40.3/24 na ether4
+- [x] DST-NAT: 172.16.40.3 → 10.39.2.1
+- [x] SRC-NAT: resposta via túnel (10.255.255.1)
+- [x] Ping CCR → 172.16.40.3 funcionando
+
+### Infraestrutura
+- CCR_ROUTER_1-BROADCAST: gateway VLAN 400 (172.16.40.1)
+- br06: switch de acesso, porta 31 untagged VLAN 400
+- HEX-RJ: ether4-vlan400 com IP 172.16.40.3
+
+---
+
+## [2026-01-30] - Configuração Inicial
 
 ### Adicionado
 - Estrutura inicial do projeto
@@ -28,7 +50,10 @@ Todas as mudanças notáveis deste projeto.
 - [x] Câmera PTZ configurada (10.39.2.1)
 - [x] Acesso Mac → Câmera funcionando
 
-### A Fazer
-- [ ] Testar controle PTZ do RJ (portas 80/443/52380)
-- [ ] Validação final em produção
+---
+
+## A Fazer
+- [ ] Testar acesso web câmera via 172.16.40.3
+- [ ] Testar controle PTZ (portas 80/443/52380)
+- [ ] Validar com Henrique no controlador
 - [ ] Configs alternativas (EoIP)
