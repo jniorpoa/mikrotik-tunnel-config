@@ -3,7 +3,7 @@
 Configuração de túnel WireGuard entre MikroTiks (Milão ↔ RJ) para controle remoto de câmeras PTZ Panasonic.
 
 ## Status
-🟢 **Operacional** - Túnel funcionando + NAT VLAN 400 configurado
+🟢 **Operacional e Validado** - Túnel + NAT + Controle PTZ funcionando
 
 ## Diagrama
 ```

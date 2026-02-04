@@ -52,8 +52,10 @@ Todas as mudanças notáveis deste projeto.
 
 ---
 
-## A Fazer
-- [ ] Testar acesso web câmera via 172.16.40.3
-- [ ] Testar controle PTZ (portas 80/443/52380)
-- [ ] Validar com Henrique no controlador
-- [ ] Configs alternativas (EoIP)
+## Concluído
+- [x] Testar acesso web câmera via 172.16.40.3 ✅
+- [x] Testar controle PTZ (portas 80/443/52380) ✅
+- [x] Validar com Henrique no controlador ✅
+
+## A Fazer (se necessário)
+- [ ] Configs alternativas (EoIP) - apenas se precisar Layer 2
