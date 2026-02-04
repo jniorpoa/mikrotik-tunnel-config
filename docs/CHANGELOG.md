@@ -17,7 +17,7 @@ Todas as mudanças notáveis deste projeto.
 - [x] HEX-RJ: DST-NAT 172.16.50.171 → 10.39.2.1
 - [x] HEX-RJ: Firewall rules VLAN 500
 - [x] HEX-RJ: Ping local 172.16.50.171 OK
-- [ ] br06: Trunk na porta 31 (VLAN 500 tagged) - pendente
+- [x] br06: Trunk na porta 31 (VLAN 500 tagged)
 
 ### Switch br06
 - Comando: `/interface bridge vlan set [find where vlan-ids=500 !dynamic] tagged=sfp-sfpplus1,sfp-sfpplus2,ether31`
