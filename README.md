@@ -88,7 +88,7 @@ CCR Broadcast (GW VLANs) → Core1/Core2 → br01-br06 → SW Andares
 
 ### Alternativa (EoIP)
 
-Se precisar de Layer 2 (broadcast), usar configs em `configs/alternativa-eoip/`
+Não necessário - Layer 3 com NAT atende o cenário atual.
 
 ## Links Úteis
 

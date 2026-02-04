@@ -57,5 +57,5 @@ Todas as mudanças notáveis deste projeto.
 - [x] Testar controle PTZ (portas 80/443/52380) ✅
 - [x] Validar com Henrique no controlador ✅
 
-## A Fazer (se necessário)
-- [ ] Configs alternativas (EoIP) - apenas se precisar Layer 2
+## Projeto Concluído
+Túnel WireGuard + NAT operacional. EoIP não necessário - Layer 3 atende o cenário.
