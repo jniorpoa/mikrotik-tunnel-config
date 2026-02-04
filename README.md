@@ -17,23 +17,25 @@ Configuração de túnel WireGuard entre MikroTiks (Milão ↔ RJ) para controle
     │  MILÃO  │◄══════════ WireGuard ══════════►│   RJ    │
     └────┬────┘         10.255.255.0/30           └────┬────┘
          │                                             │
-    ┌────┴─────────────────┐                     ┌────┴─────────────────────┐
-    │  BRIDGE (ether2-4)   │                     │  ether4 (VLAN 400)       │
-    │    10.39.2.0/24      │                     │  172.16.40.3 ← NAT       │
-    ├──────────────────────┤                     │                          │
-    │ ether2: PTZ 10.39.2.1│◄─── NAT ───────────│  DST-NAT: 172.16.40.3    │
-    │ ether3: [reserva]    │     traduz         │       → 10.39.2.1        │
-    │ ether4: [reserva]    │                     └────┬─────────────────────┘
-    └──────────────────────┘                          │
-                                                      │ VLAN 400
-    ┌──────────────────────┐                     ┌────┴─────────────────────┐
-    │  GERÊNCIA (ether5)   │                     │  br06 (porta 31)         │
-    │    10.19.4.97/24     │                     │       ↓                  │
-    └──────────────────────┘                     │  Core → SW Andares       │
-          MILÃO                                  │       ↓                  │
-                                                 │  Controlador PTZ         │
-                                                 │  (acessa 172.16.40.3)    │
-                                                 └──────────────────────────┘
+    ┌────┴─────────────────┐                     ┌────┴──────────────────────────┐
+    │  BRIDGE (ether2-4)   │                     │  ether4 (trunk)               │
+    │    10.39.2.0/24      │                     │  ├ VLAN 400 native            │
+    ├──────────────────────┤                     │  │  172.16.40.3 ← NAT        │
+    │ ether2: PTZ 10.39.2.1│◄─── NAT ───────────│  └ VLAN 500 tagged            │
+    │ ether3: [reserva]    │     traduz          │     172.16.50.171 ← NAT      │
+    │ ether4: [reserva]    │                     │  DST-NAT → 10.39.2.1         │
+    └──────────────────────┘                     └────┬──────────────────────────┘
+                                                      │
+                                                      │ Trunk (VLAN 400+500)
+    ┌──────────────────────┐                     ┌────┴──────────────────────────┐
+    │  GERÊNCIA (ether5)   │                     │  br06 (porta 31 trunk)        │
+    │    10.19.4.97/24     │                     │       ↓                       │
+    └──────────────────────┘                     │  Core → SW Andares            │
+          MILÃO                                  │       ↓                       │
+                                                 │  Controlador PTZ              │
+                                                 │  (172.16.40.3 ou              │
+                                                 │   172.16.50.171)              │
+                                                 └───────────────────────────────┘
                                                           RJ
 ```
 
@@ -44,7 +46,8 @@ Configuração de túnel WireGuard entre MikroTiks (Milão ↔ RJ) para controle
 | Milão | ether1 | DHCP (internet) | - |
 | Milão | bridge-ptz (ether2-4) | 10.39.2.0/24 | .254 |
 | Milão | ether5 (gerência) | 10.19.4.97/24 | - |
-| RJ | ether4 (VLAN 400) | 172.16.40.3/24 | .1 (CCR) |
+| RJ | ether4 VLAN 400 (native) | 172.16.40.3/24 | .1 (CCR) |
+| RJ | ether4 VLAN 500 (tagged) | 172.16.50.171/24 | - |
 | RJ | ether5 (gerência) | 10.19.4.98/24 | - |
 | Túnel | WireGuard | 10.255.255.0/30 | - |
 
@@ -52,7 +55,8 @@ Configuração de túnel WireGuard entre MikroTiks (Milão ↔ RJ) para controle
 
 - **PTZ Panasonic AW-UE70**
   - IP Real: 10.39.2.1 (Milão)
-  - IP NAT: 172.16.40.3 (acessível da VLAN 400 no RJ)
+  - IP NAT VLAN 400: 172.16.40.3 (acessível da VLAN 400 no RJ)
+  - IP NAT VLAN 500: 172.16.50.171 (acessível da VLAN 500 no RJ)
   - Controle: TCP 80/443, UDP 52380
 - **MikroTik Milão**: hEX S (RB760iGS) - Gerência: 10.19.4.97
 - **MikroTik RJ**: hEX S (RB760iGS) - Gerência: 10.19.4.98 - WAN: 200.166.233.205/28 - Winbox: 9595
@@ -62,8 +66,9 @@ Configuração de túnel WireGuard entre MikroTiks (Milão ↔ RJ) para controle
 ```
 CCR Broadcast (GW VLANs) → Core1/Core2 → br01-br06 → SW Andares
                                               ↓
-                                        br06 porta 31
-                                        VLAN 400 untagged
+                                        br06 porta 31 (trunk)
+                                        VLAN 400 native (PVID 400)
+                                        VLAN 500 tagged
                                               ↓
                                         HEX-RJ ether4
 ```
@@ -85,6 +90,7 @@ CCR Broadcast (GW VLANs) → Core1/Core2 → br01-br06 → SW Andares
 1. `01-wireguard.rsc` - Interface e peer
 2. `02-firewall-rules.rsc` - Liberar portas
 3. `03-routing.rsc` - Rota para rede Milão
+4. `04-vlan500-nat.rsc` - Trunk VLAN 500 + NAT
 
 ### Alternativa (EoIP)
 

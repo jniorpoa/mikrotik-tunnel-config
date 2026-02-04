@@ -2,6 +2,29 @@
 
 Todas as mudanças notáveis deste projeto.
 
+## [2026-02-04] - Trunk VLAN 500
+
+### Adicionado
+- Trunk na ether4: VLAN 400 native + VLAN 500 tagged
+- Interface VLAN 500 (vlan500-ptz) sobre ether4-vlan400
+- NAT para camera PTZ via VLAN 500: 172.16.50.171 → 10.39.2.1
+- Firewall input e forward para VLAN 500 (172.16.50.0/24)
+- Config incremental: `configs/rj/04-vlan500-nat.rsc`
+- Session log: 2026-02-04-trunk-vlan500.md
+
+### Configurado em Producao
+- [x] HEX-RJ: VLAN 500 interface + IP 172.16.50.171
+- [x] HEX-RJ: DST-NAT 172.16.50.171 → 10.39.2.1
+- [x] HEX-RJ: Firewall rules VLAN 500
+- [x] HEX-RJ: Ping local 172.16.50.171 OK
+- [ ] br06: Trunk na porta 31 (VLAN 500 tagged) - pendente
+
+### Switch br06
+- Comando: `/interface bridge vlan set [find where vlan-ids=500 !dynamic] tagged=sfp-sfpplus1,sfp-sfpplus2,ether31`
+- PVID 400 mantido (VLAN 400 native nao afetada)
+
+---
+
 ## [2026-02-04] - NAT VLAN 400
 
 ### Adicionado

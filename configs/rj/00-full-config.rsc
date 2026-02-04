@@ -5,8 +5,9 @@
 # Winbox WAN: porta 9595
 #
 # Atualizado: 2026-02-04
-# - ether4 conectada ao br06 porta 31 (VLAN 400)
-# - NAT para camera PTZ: 172.16.40.3 -> 10.39.2.1
+# - ether4 conectada ao br06 porta 31 (trunk: VLAN 400 native + VLAN 500 tagged)
+# - NAT para camera PTZ: 172.16.40.3 -> 10.39.2.1 (VLAN 400)
+# - NAT para camera PTZ: 172.16.50.171 -> 10.39.2.1 (VLAN 500)
 
 # Identity
 /system identity set name=HEX-RJ
@@ -26,8 +27,14 @@
 /ip route add gateway=200.166.233.193 comment="Gateway internet"
 /ip dns set servers=8.8.8.8,8.8.4.4
 
-# IP VLAN 400 - NAT para camera PTZ
+# IP VLAN 400 - NAT para camera PTZ (native/untagged)
 /ip address add address=172.16.40.3/24 interface=ether4-vlan400 comment="IP camera PTZ - NAT para Milao"
+
+# VLAN 500 - trunk sobre ether4
+/interface vlan add name=vlan500-ptz vlan-id=500 interface=ether4-vlan400 \
+    comment="VLAN 500 - PTZ rede 172.16.50.x (trunk ether4)"
+/ip address add address=172.16.50.171/24 interface=vlan500-ptz \
+    comment="IP camera PTZ - NAT para Milao (VLAN 500)"
 
 # WireGuard
 /interface wireguard add name=wg-tunel-milao listen-port=51820 comment="Tunel para Milao"
@@ -54,12 +61,15 @@
 /ip firewall nat
 add chain=dstnat dst-address=172.16.40.3 action=dst-nat to-addresses=10.39.2.1 \
     comment="NAT camera PTZ Milao - traducao IP antigo"
+add chain=dstnat dst-address=172.16.50.171 action=dst-nat to-addresses=10.39.2.1 \
+    comment="NAT camera PTZ Milao - VLAN 500"
 add chain=srcnat dst-address=10.39.2.1 action=src-nat to-addresses=10.255.255.1 \
     comment="SNAT camera PTZ - resposta via tunel"
 
 # Firewall
 /ip firewall filter
 add chain=input action=accept src-address=172.16.40.0/24 comment="Aceita VLAN 400 - PTZ"
+add chain=input action=accept src-address=172.16.50.0/24 comment="Aceita VLAN 500 - PTZ"
 add chain=input action=accept connection-state=established,related comment="Aceita conexoes estabelecidas"
 add chain=input action=drop connection-state=invalid comment="Descarta invalidas"
 add chain=input action=accept protocol=icmp comment="Aceita ICMP"
@@ -79,6 +89,8 @@ add chain=forward action=accept connection-state=established,related comment="Ac
 add chain=forward action=drop connection-state=invalid comment="Descarta invalidas"
 add chain=forward action=accept src-address=172.16.40.0/24 dst-address=10.39.2.0/24 comment="VLAN 400 -> PTZ Milao via NAT"
 add chain=forward action=accept src-address=10.39.2.0/24 dst-address=172.16.40.0/24 comment="PTZ Milao -> VLAN 400"
+add chain=forward action=accept src-address=172.16.50.0/24 dst-address=10.39.2.0/24 comment="VLAN 500 -> PTZ Milao via NAT"
+add chain=forward action=accept src-address=10.39.2.0/24 dst-address=172.16.50.0/24 comment="PTZ Milao -> VLAN 500"
 add chain=forward action=accept src-address=10.55.21.0/24 dst-address=10.39.2.0/24 comment="LAN RJ -> PTZ Milao"
 add chain=forward action=accept src-address=10.39.2.0/24 dst-address=10.55.21.0/24 comment="PTZ Milao -> LAN RJ"
 add chain=forward action=accept src-address=10.255.255.5 comment="Forward Mac Junior"
